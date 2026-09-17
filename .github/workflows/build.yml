@@ -29,6 +29,11 @@ jobs:
           ln -sf aarch64-elf-objcopy toolchain/gcc64/bin/aarch64-elf-elfedit
           ln -sf arm-eabi-objcopy toolchain/gcc32/bin/arm-eabi-elfedit
 
+      - name: Paksa /usr/bin/ld jadi ld.lld (beberapa sub-Makefile manggil 'ld' polos, gak ikut CROSS_COMPILE)
+        run: |
+          sudo mv /usr/bin/ld /usr/bin/ld.original
+          sudo ln -sf $GITHUB_WORKSPACE/toolchain/clang/bin/ld.lld /usr/bin/ld
+      
       - name: Get SukiSU-Ultra + SUSFS (bukan KernelSU-Next)
         working-directory: kernel
         run: |
