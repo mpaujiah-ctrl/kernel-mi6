@@ -22,16 +22,12 @@ jobs:
       - name: Clone kernel source
         run: git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_REPO }} kernel
 
-      - name: Get GCC toolchain (buat AS, karena 4.4 msm8998 butuh -no-integrated-as)
-        run: |
-          mkdir -p toolchain/gcc64 toolchain/gcc32
-          git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9 toolchain/gcc64
-          git clone --depth=1 https://github.com/LineageOS/android_prebuilts_gcc_linux-x86_arm_arm-linux-androideabi-4.9 toolchain/gcc32
-
-      - name: Get Clang
+      - name: Get Clang (via AOSP Gitiles tarball, sama metode kayak cepheus)
         run: |
           mkdir -p toolchain/clang
-          git clone --depth=1 https://github.com/LineageOS/android_prebuilts_clang_host_linux-x86_clang-r416183b toolchain/clang
+          curl -Ls "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-11.0.0_r28/clang-r383902b.tar.gz" \
+            -o clang.tar.gz
+          tar -xzf clang.tar.gz -C toolchain/clang
 
       - name: Setup KernelSU-Next (manual hook mode)
         working-directory: kernel
