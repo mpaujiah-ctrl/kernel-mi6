@@ -22,6 +22,15 @@ jobs:
       - name: Clone kernel source
         run: git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_REPO }} kernel    
 
+      - name: Get GCC toolchain (dari AOSP googlesource, tag lama sebelum binary dicabut)
+        run: |
+          git clone --depth=1 -b android-8.1.0_r1 \
+            https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 \
+            toolchain/gcc64
+          git clone --depth=1 -b android-8.1.0_r1 \
+            https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 \
+            toolchain/gcc32
+      
       - name: Setup KernelSU-Next (manual hook mode)
         working-directory: kernel
         run: |
