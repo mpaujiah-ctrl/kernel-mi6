@@ -39,16 +39,18 @@ jobs:
           git clone --depth=1 https://gitlab.com/simonpunk/susfs4ksu -b kernel-4.4 susfs4ksu || \
           git clone --depth=1 https://gitlab.com/simonpunk/susfs4ksu susfs4ksu
 
-      - name: Build kernel (clang r416183b, sama seperti referensi)
+      - name: Build kernel (clang r416183b, force toolchain path manual)
         working-directory: kernel
         run: |
-          export PATH="$GITHUB_WORKSPACE/toolchain/clang/bin:$PATH"
+          export PATH="$GITHUB_WORKSPACE/toolchain/clang/bin:$GITHUB_WORKSPACE/toolchain/gcc64/bin:$GITHUB_WORKSPACE/toolchain/gcc32/bin:$PATH"
           make O=out ARCH=${{ env.ARCH }} ${{ env.DEFCONFIG }}
           make O=out ARCH=${{ env.ARCH }} -j$(nproc) \
             CC=clang \
             CLANG_TRIPLE=aarch64-linux-gnu- \
             CROSS_COMPILE=aarch64-linux-android- \
-            CROSS_COMPILE_ARM32=arm-linux-androideabi-
+            CROSS_COMPILE_ARM32=arm-linux-androideabi- \
+            KCFLAGS="-Wno-error=asm-operand-widths --prefix=$GITHUB_WORKSPACE/toolchain/gcc64/bin/ --gcc-toolchain=$GITHUB_WORKSPACE/toolchain/gcc64" \
+            KAFLAGS="--prefix=$GITHUB_WORKSPACE/toolchain/gcc64/bin/"
      
       - name: Upload Image
         uses: actions/upload-artifact@v4
