@@ -51,7 +51,9 @@ jobs:
             LD=ld.lld \
             CLANG_TRIPLE=aarch64-linux-gnu- \
             CROSS_COMPILE=aarch64-elf- \
-            CROSS_COMPILE_ARM32=arm-eabi-
+            CROSS_COMPILE_ARM32=arm-eabi- \
+            KCFLAGS="-fuse-ld=lld" \
+            LDFLAGS="-fuse-ld=lld"
      
       - name: Upload Image
         uses: actions/upload-artifact@v4
