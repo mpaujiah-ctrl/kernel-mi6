@@ -47,8 +47,8 @@ jobs:
           export PATH="$GITHUB_WORKSPACE/toolchain/gcc64/bin:$GITHUB_WORKSPACE/toolchain/gcc32/bin:$PATH"
           make O=out ARCH=${{ env.ARCH }} ${{ env.DEFCONFIG }}
           make O=out ARCH=${{ env.ARCH }} -j$(nproc) \
-            CROSS_COMPILE=aarch64-linux-android- \
-            CROSS_COMPILE_ARM32=arm-linux-androideabi-
+            CROSS_COMPILE=aarch64-elf- \
+            CROSS_COMPILE_ARM32=arm-eabi-
 
       - name: Upload Image
         uses: actions/upload-artifact@v4
