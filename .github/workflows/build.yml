@@ -36,6 +36,11 @@ jobs:
           git clone --depth=1 https://gitlab.com/simonpunk/susfs4ksu -b kernel-4.4 susfs4ksu || \
           git clone --depth=1 https://gitlab.com/simonpunk/susfs4ksu susfs4ksu
 
+      - name: Ganti aarch64-elf-ld dengan ld.lld (vdso Makefile hardcode CROSS_COMPILE ld)
+        run: |
+          rm -f toolchain/gcc64/bin/aarch64-elf-ld
+          ln -s $GITHUB_WORKSPACE/toolchain/clang/bin/ld.lld toolchain/gcc64/bin/aarch64-elf-ld
+      
       - name: Build kernel (clang r416183b, force toolchain path manual)
         working-directory: kernel
         run: |
