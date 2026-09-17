@@ -20,14 +20,7 @@ jobs:
             build-essential python3 python-is-python3 zip
 
       - name: Clone kernel source
-        run: git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_REPO }} kernel
-
-      - name: Get Clang (via AOSP Gitiles tarball, sama metode kayak cepheus)
-        run: |
-          mkdir -p toolchain/clang
-          curl -Ls "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/tags/android-11.0.0_r28/clang-r383902b.tar.gz" \
-            -o clang.tar.gz
-          tar -xzf clang.tar.gz -C toolchain/clang
+        run: git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_REPO }} kernel    
 
       - name: Setup KernelSU-Next (manual hook mode)
         working-directory: kernel
@@ -43,16 +36,14 @@ jobs:
           echo "CONFIG_KSU=y" >> arch/arm64/configs/${{ env.DEFCONFIG }}
           echo "CONFIG_KSU_MANUAL_HOOK=y" >> arch/arm64/configs/${{ env.DEFCONFIG }}
 
-      - name: Build kernel
+      - name: Build kernel (full GCC, no clang)
         working-directory: kernel
         run: |
-          export PATH="$GITHUB_WORKSPACE/toolchain/clang/bin:$GITHUB_WORKSPACE/toolchain/gcc64/bin:$GITHUB_WORKSPACE/toolchain/gcc32/bin:$PATH"
+          export PATH="$GITHUB_WORKSPACE/toolchain/gcc64/bin:$GITHUB_WORKSPACE/toolchain/gcc32/bin:$PATH"
           make O=out ARCH=${{ env.ARCH }} ${{ env.DEFCONFIG }}
           make O=out ARCH=${{ env.ARCH }} -j$(nproc) \
-            CC=clang \
             CROSS_COMPILE=aarch64-linux-android- \
-            CROSS_COMPILE_ARM32=arm-linux-androideabi- \
-            CLANG_TRIPLE=aarch64-linux-gnu-
+            CROSS_COMPILE_ARM32=arm-linux-androideabi-
 
       - name: Upload Image
         uses: actions/upload-artifact@v4
