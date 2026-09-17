@@ -22,15 +22,12 @@ jobs:
       - name: Clone kernel source
         run: git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_REPO }} kernel    
 
-      - name: Get Clang r416183b (tag terbukti jalan di boot.img referensi)
+      - name: Get GCC toolchain (mvaisakh, GCC 7.5)
         run: |
-          git clone --filter=blob:none --no-checkout --depth=1 \
-            https://github.com/AOSPA/android_prebuilts_clang_host_linux-x86 toolchain/clang-src
-          cd toolchain/clang-src
-          git sparse-checkout init --cone
-          git sparse-checkout set clang-r416183b
-          git checkout
-          mv clang-r416183b ../clang
+          git clone --depth=1 -b gcc-master https://github.com/mvaisakh/gcc-arm64 toolchain/gcc64
+          git clone --depth=1 -b gcc-master https://github.com/mvaisakh/gcc-arm toolchain/gcc32
+          ln -sf aarch64-elf-objcopy toolchain/gcc64/bin/aarch64-elf-elfedit
+          ln -sf arm-eabi-objcopy toolchain/gcc32/bin/arm-eabi-elfedit
 
       - name: Get SukiSU-Ultra + SUSFS (bukan KernelSU-Next)
         working-directory: kernel
@@ -47,10 +44,8 @@ jobs:
           make O=out ARCH=${{ env.ARCH }} -j$(nproc) \
             CC=clang \
             CLANG_TRIPLE=aarch64-linux-gnu- \
-            CROSS_COMPILE=aarch64-linux-android- \
-            CROSS_COMPILE_ARM32=arm-linux-androideabi- \
-            KCFLAGS="-Wno-error=asm-operand-widths --prefix=$GITHUB_WORKSPACE/toolchain/gcc64/bin/ --gcc-toolchain=$GITHUB_WORKSPACE/toolchain/gcc64" \
-            KAFLAGS="--prefix=$GITHUB_WORKSPACE/toolchain/gcc64/bin/"
+            CROSS_COMPILE=aarch64-elf- \
+            CROSS_COMPILE_ARM32=arm-eabi-
      
       - name: Upload Image
         uses: actions/upload-artifact@v4
