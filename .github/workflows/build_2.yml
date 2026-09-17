@@ -1,0 +1,59 @@
+name: Build Kernel MI6 (KSUN)
+
+on:
+  workflow_dispatch:
+
+env:
+  KERNEL_REPO: https://github.com/Sagit-A15/android_kernel_xiaomi_msm8998-cip2
+  KERNEL_BRANCH: lineage-22.2
+  DEFCONFIG: sagit_defconfig
+  ARCH: arm64
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install deps
+        run: |
+         sudo apt-get update
+         sudo apt-get install -y bc bison flex libssl-dev libelf-dev \
+            build-essential python3 python-is-python3 zip libdebuginfod1
+
+      - name: Clone kernel source
+        run: git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_REPO }} kernel    
+
+      - name: Get GCC toolchain (mvaisakh, GCC 7.5 — GCC 4.9 kekunoan buat source ini)
+        run: |
+          git clone --depth=1 -b gcc-master https://github.com/mvaisakh/gcc-arm64 toolchain/gcc64
+          git clone --depth=1 -b gcc-master https://github.com/mvaisakh/gcc-arm toolchain/gcc32
+      
+      - name: Setup KernelSU-Next (manual hook mode)
+        working-directory: kernel
+        run: |
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s next
+          # matikan kprobe hook, paksa manual hook — wajib buat kernel 4.4 non-GKI
+          find KernelSU-Next -type f -name '*.c' -exec \
+            sed -i 's/#ifdef CONFIG_KPROBES/#if defined(CONFIG_KPROBES) \&\& 0/g' {} +
+
+      - name: Enable KSU config di defconfig
+        working-directory: kernel
+        run: |
+          echo "CONFIG_KSU=y" >> arch/arm64/configs/${{ env.DEFCONFIG }}
+          echo "CONFIG_KSU_MANUAL_HOOK=y" >> arch/arm64/configs/${{ env.DEFCONFIG }}
+          echo "# CONFIG_ACPI is not set" >> arch/arm64/configs/${{ env.DEFCONFIG }}
+
+      - name: Build kernel (full GCC, no clang)
+        working-directory: kernel
+        run: |
+          export PATH="$GITHUB_WORKSPACE/toolchain/gcc64/bin:$GITHUB_WORKSPACE/toolchain/gcc32/bin:$PATH"
+          make O=out ARCH=${{ env.ARCH }} ${{ env.DEFCONFIG }}
+          make O=out ARCH=${{ env.ARCH }} -j$(nproc) \
+            CROSS_COMPILE=aarch64-elf- \
+            CROSS_COMPILE_ARM32=arm-eabi- \
+            KCFLAGS="-Wno-error"
+     
+      - name: Upload Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-msm8998-ksun
+          path: kernel/out/arch/arm64/boot/Image*
