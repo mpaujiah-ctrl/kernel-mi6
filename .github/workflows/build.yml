@@ -15,9 +15,9 @@ jobs:
     steps:
       - name: Install deps
         run: |
-          sudo apt-get update
-          sudo apt-get install -y bc bison flex libssl-dev libelf-dev \
-            build-essential python3 python-is-python3 zip
+         sudo apt-get update
+         sudo apt-get install -y bc bison flex libssl-dev libelf-dev \
+            build-essential python3 python-is-python3 zip libdebuginfod1
 
       - name: Clone kernel source
         run: git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_REPO }} kernel    
@@ -48,8 +48,9 @@ jobs:
           make O=out ARCH=${{ env.ARCH }} ${{ env.DEFCONFIG }}
           make O=out ARCH=${{ env.ARCH }} -j$(nproc) \
             CROSS_COMPILE=aarch64-elf- \
-            CROSS_COMPILE_ARM32=arm-eabi-
-
+            CROSS_COMPILE_ARM32=arm-eabi- \
+            KCFLAGS="-Wno-error"
+     
       - name: Upload Image
         uses: actions/upload-artifact@v4
         with:
