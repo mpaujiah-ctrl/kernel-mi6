@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  KERNEL_REPO: https://github.com/<akun-lu>/android_kernel_xiaomi_msm8998
+  KERNEL_REPO: https://github.com/mpaujiah-ctrl/android_kernel_xiaomi_msm8998
   KERNEL_BRANCH: lineage-22.2
   DEFCONFIG: sagit_defconfig
   ARCH: arm64
