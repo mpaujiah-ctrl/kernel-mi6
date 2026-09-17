@@ -46,10 +46,11 @@ jobs:
           rm -f toolchain/gcc64/bin/aarch64-elf-ld
           ln -s $GITHUB_WORKSPACE/toolchain/clang/bin/ld.lld toolchain/gcc64/bin/aarch64-elf-ld
       
-      - name: Build kernel (clang r416183b, force toolchain path manual)
+      - name: Build kernel (clang r416183b)
         working-directory: kernel
         run: |
           export PATH="$GITHUB_WORKSPACE/toolchain/clang/bin:$GITHUB_WORKSPACE/toolchain/gcc64/bin:$GITHUB_WORKSPACE/toolchain/gcc32/bin:$PATH"
+          export LDFLAGS="-fuse-ld=lld"
           make O=out ARCH=${{ env.ARCH }} ${{ env.DEFCONFIG }}
           make O=out ARCH=${{ env.ARCH }} -j$(nproc) \
             CC=clang \
@@ -57,8 +58,7 @@ jobs:
             CLANG_TRIPLE=aarch64-linux-gnu- \
             CROSS_COMPILE=aarch64-elf- \
             CROSS_COMPILE_ARM32=arm-eabi- \
-            KCFLAGS="-fuse-ld=lld" \
-            LDFLAGS="-fuse-ld=lld"
+            KCFLAGS="-fuse-ld=lld"
      
       - name: Upload Image
         uses: actions/upload-artifact@v4
