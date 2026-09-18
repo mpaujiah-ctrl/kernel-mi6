@@ -29,6 +29,10 @@ jobs:
           ln -sf aarch64-elf-objcopy toolchain/gcc64/bin/aarch64-elf-elfedit
           ln -sf arm-eabi-objcopy toolchain/gcc32/bin/arm-eabi-elfedit
      
+      - name: Sediakan 'ld' polos → ld.lld (banyak sub-Makefile manggil ld tanpa prefix)
+        run: |
+          ln -sf ld.lld $GITHUB_WORKSPACE/toolchain/clang/bin/ld
+      
       - name: Get SukiSU-Ultra + SUSFS (bukan KernelSU-Next)
         working-directory: kernel
         run: |
