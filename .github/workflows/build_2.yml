@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
 
 env:
-  KERNEL_REPO: https://github.com/Sagit-A15/android_kernel_xiaomi_msm8998-cip2
-  KERNEL_BRANCH: lineage-22.2
-  DEFCONFIG: sagit_defconfig
+  KERNEL_REPO: https://github.com/mpaujiah-ctrl/android_kernel_xiaomi_MI6
+  KERNEL_BRANCH: lineage-23.2
+  DEFCONFIG: sagit.config
   ARCH: arm64
 
 jobs:
