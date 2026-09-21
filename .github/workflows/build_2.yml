@@ -1,59 +1,64 @@
-name: Build Kernel MI6 (KSUN)
+name: Build Mi 6 Kernel Plain
 
 on:
   workflow_dispatch:
 
-env:
-  KERNEL_REPO: https://github.com/mpaujiah-ctrl/android_kernel_xiaomi_MI6
-  KERNEL_BRANCH: lineage-23.2
-  DEFCONFIG: sagit.config
-  ARCH: arm64
-
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    name: Build Kernel
+    runs-on: ubuntu-latest
     steps:
-      - name: Install deps
-        run: |
-         sudo apt-get update
-         sudo apt-get install -y bc bison flex libssl-dev libelf-dev \
-            build-essential python3 python-is-python3 zip libdebuginfod1
+      - name: Checkout Kernel Source
+        uses: actions/checkout@v4
+        with:
+          repository: mpaujiah-ctrl/android_kernel_xiaomi_MI6
+          ref: lineage-22.2
+          path: kernel-source
 
-      - name: Clone kernel source
-        run: git clone --depth=1 -b ${{ env.KERNEL_BRANCH }} ${{ env.KERNEL_REPO }} kernel    
+      - name: Set up Environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential bc bison flex libssl-dev libncurses5-dev libncursesw5-dev libsqlite3-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev ccache zip lzop cpio libelf-dev
 
-      - name: Get GCC toolchain (mvaisakh, GCC 7.5 — GCC 4.9 kekunoan buat source ini)
+      - name: Download Toolchain (AOSP Clang r536225)
         run: |
-          git clone --depth=1 -b gcc-master https://github.com/mvaisakh/gcc-arm64 toolchain/gcc64
-          git clone --depth=1 -b gcc-master https://github.com/mvaisakh/gcc-arm toolchain/gcc32
-      
-      - name: Setup KernelSU-Next (manual hook mode)
-        working-directory: kernel
-        run: |
-          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s next
-          # matikan kprobe hook, paksa manual hook — wajib buat kernel 4.4 non-GKI
-          find KernelSU-Next -type f -name '*.c' -exec \
-            sed -i 's/#ifdef CONFIG_KPROBES/#if defined(CONFIG_KPROBES) \&\& 0/g' {} +
+          mkdir -p toolchain
+          cd toolchain
+          wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/b3a530ec6537146650e42be89f1089e9a3588460/clang-r536225.tar.gz
+          mkdir clang
+          tar -xf clang-r536225.tar.gz -C clang
+          rm clang-r536225.tar.gz
 
-      - name: Enable KSU config di defconfig
-        working-directory: kernel
+      - name: Build Kernel
         run: |
-          echo "CONFIG_KSU=y" >> arch/arm64/configs/${{ env.DEFCONFIG }}
-          echo "CONFIG_KSU_MANUAL_HOOK=y" >> arch/arm64/configs/${{ env.DEFCONFIG }}
-          echo "# CONFIG_ACPI is not set" >> arch/arm64/configs/${{ env.DEFCONFIG }}
+          cd kernel-source
+          export PATH="$(pwd)/../toolchain/clang/bin:$PATH"
+          export ARCH=arm64
+          export SUBARCH=arm64
+          export CC=clang
+          export CLANG_TRIPLE=aarch64-linux-gnu-
+          export CROSS_COMPILE=aarch64-linux-gnu-
+          export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
 
-      - name: Build kernel (full GCC, no clang)
-        working-directory: kernel
+          # Defconfig standar sagit/msm8998
+          make O=out xiaomi/mi8998_defconfig
+          make -j$(nproc --all) O=out
+
+      - name: Check Output
         run: |
-          export PATH="$GITHUB_WORKSPACE/toolchain/gcc64/bin:$GITHUB_WORKSPACE/toolchain/gcc32/bin:$PATH"
-          make O=out ARCH=${{ env.ARCH }} ${{ env.DEFCONFIG }}
-          make O=out ARCH=${{ env.ARCH }} -j$(nproc) \
-            CROSS_COMPILE=aarch64-elf- \
-            CROSS_COMPILE_ARM32=arm-eabi- \
-            KCFLAGS="-Wno-error"
-     
-      - name: Upload Image
+          if [ -f kernel-source/out/arch/arm64/boot/Image.gz-dtb ]; then
+            echo "Kernel successfully compiled!"
+          elif [ -f kernel-source/out/arch/arm64/boot/Image.gz ]; then
+            echo "Kernel Image.gz built!"
+          else
+            echo "Kernel build failed or binary is in a different path."
+            exit 1
+          fi
+
+      - name: Upload Kernel Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-msm8998-ksun
-          path: kernel/out/arch/arm64/boot/Image*
+          name: Mi6-Kernel-Lineage22.2
+          path: |
+            kernel-source/out/arch/arm64/boot/Image*
+            kernel-source/out/arch/arm64/boot/dts/qcom/*.dtb
