@@ -24,7 +24,7 @@ jobs:
         run: |
           mkdir -p toolchain/clang
           cd toolchain
-          # Download AOSP Clang r536225 dari mirror release yang stabil
+          # Menggunakan -O (huruf O besar) untuk nama output file
           wget -q https://github.com/ZyCronite/Clang/releases/download/19.0.0-r536225/Clang-19.0.0-r536225.tar.gz -O clang.tar.gz
           tar -xf clang.tar.gz -C clang
           rm clang.tar.gz
