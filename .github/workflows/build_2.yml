@@ -20,12 +20,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential bc bison flex libssl-dev libncurses5-dev libncursesw5-dev libsqlite3-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev ccache zip lzop cpio libelf-dev
 
-      - name: Download Toolchain (AOSP Clang r536225)
+      - name: Download Toolchain (Proton Clang)
         run: |
           mkdir -p toolchain
-          cd toolchain
-          # Download AOSP Clang versi r536225 resmi dari repository git-core/prebuilt
-          git clone https://gitlab.com/reagans/clang-r536225.git --depth=1 clang
+          git clone https://github.com/kdrag0n/proton-clang.git --depth=1 toolchain/clang
       
       - name: Build Kernel
         run: |
