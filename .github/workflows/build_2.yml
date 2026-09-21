@@ -24,11 +24,12 @@ jobs:
         run: |
           mkdir -p toolchain
           cd toolchain
-          wget -q https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/b3a530ec6537146650e42be89f1089e9a3588460/clang-r536225.tar.gz
+          git clone https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 --depth=1 -b master clang-repo
+          # Pindahkan folder clang ke lokasi yang ditentukan
           mkdir clang
-          tar -xf clang-r536225.tar.gz -C clang
-          rm clang-r536225.tar.gz
-
+          cp -r clang-repo/clang-r536225/* clang/ || cp -r clang-repo/clang-*/* clang/
+          rm -rf clang-repo
+      
       - name: Build Kernel
         run: |
           cd kernel-source
