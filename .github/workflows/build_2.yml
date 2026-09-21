@@ -24,15 +24,10 @@ jobs:
         run: |
           mkdir -p toolchain/clang
           cd toolchain
-          # Clone commit spesifik r536225
-          git init clang_tmp
-          cd clang_tmp
-          git remote add origin https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86
-          git fetch --depth 1 origin b3a530ec6537146650e42be89f1089e9a3588460
-          git checkout FETCH_HEAD
-          # Pindahkan isi folder clang-r536225 ke toolchain/clang
-          cp -r clang-r536225/* ../clang/
-          cd .. && rm -rf clang_tmp
+          # Download AOSP Clang r536225 dari mirror release yang stabil
+          wget -q https://github.com/ZyCronite/Clang/releases/download/19.0.0-r536225/Clang-19.0.0-r536225.tar.gz -O clang.tar.gz
+          tar -xf clang.tar.gz -C clang
+          rm clang.tar.gz
       
       - name: Build Kernel
         run: |
