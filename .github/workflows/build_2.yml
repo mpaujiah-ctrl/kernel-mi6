@@ -22,12 +22,10 @@ jobs:
 
       - name: Download Toolchain (AOSP Clang r536225)
         run: |
-          mkdir -p toolchain/clang
+          mkdir -p toolchain
           cd toolchain
-          # Menggunakan -O (huruf O besar) untuk nama output file
-          wget -q https://github.com/ZyCronite/Clang/releases/download/19.0.0-r536225/Clang-19.0.0-r536225.tar.gz -O clang.tar.gz
-          tar -xf clang.tar.gz -C clang
-          rm clang.tar.gz
+          # Download AOSP Clang versi r536225 resmi dari repository git-core/prebuilt
+          git clone https://gitlab.com/reagans/clang-r536225.git --depth=1 clang
       
       - name: Build Kernel
         run: |
