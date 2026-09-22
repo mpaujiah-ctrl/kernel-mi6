@@ -22,11 +22,19 @@ jobs:
 
       - name: Download Toolchain (AOSP Clang r536225)
         run: |
-          mkdir -p toolchain/clang
-          # Menggunakan curl dengan flag -L (follow redirect) agar link googlesource tidak HTTP 500 / exit code 8
-          curl -LSs "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/b3a530ec6537146650e42be89f1089e9a3588460/clang-r536225.tar.gz" -o clang.tar.gz
-          tar -xf clang.tar.gz -C toolchain/clang
-          rm clang.tar.gz
+          mkdir -p toolchain
+          # Clone langsung dari googlesource pakai partial clone + sparse-checkout,
+          # jauh lebih stabil daripada +archive tarball yang sering balikin HTML/500
+          git clone --filter=blob:none --no-checkout \
+            https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 \
+            toolchain/clang-src
+          cd toolchain/clang-src
+          git sparse-checkout init --cone
+          git sparse-checkout set clang-r536225
+          git checkout main
+          cd ../..
+          mv toolchain/clang-src/clang-r536225 toolchain/clang
+          rm -rf toolchain/clang-src
       
       - name: Build Kernel
         run: |
