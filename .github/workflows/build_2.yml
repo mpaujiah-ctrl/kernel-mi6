@@ -40,7 +40,7 @@ jobs:
           git clone --depth=1 https://github.com/mvaisakh/gcc-arm64.git toolchain/gcc-arm64
           git clone --depth=1 https://github.com/mvaisakh/gcc-arm.git toolchain/gcc-arm32
 
-          - name: Build Kernel
+      - name: Build Kernel
         run: |
           cd kernel-source
           export PATH="$(pwd)/../toolchain/clang/bin:$(pwd)/../toolchain/gcc-arm64/bin:$(pwd)/../toolchain/gcc-arm32/bin:$PATH"
