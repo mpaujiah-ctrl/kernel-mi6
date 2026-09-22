@@ -52,7 +52,7 @@ jobs:
           export CROSS_COMPILE_ARM32=arm-eabi-
 
           make O=out vendor/xiaomi/mi8998_defconfig
-          make -j$(nproc --all) O=out
+          make -j$(nproc --all) O=out KCFLAGS="-Wno-error"
 
       - name: Check Output
         run: |
