@@ -37,8 +37,8 @@ jobs:
       - name: Download GCC Cross-Toolchains (arm64 + arm32)
         run: |
           mkdir -p toolchain
-          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9 toolchain/gcc-arm64
-          git clone --depth=1 https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9 toolchain/gcc-arm32
+          git clone --depth=1 https://github.com/mvaisakh/gcc-arm64.git toolchain/gcc-arm64
+          git clone --depth=1 https://github.com/mvaisakh/gcc-arm.git toolchain/gcc-arm32
 
       - name: Build Kernel
         run: |
