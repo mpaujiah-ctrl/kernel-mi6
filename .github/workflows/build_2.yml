@@ -40,7 +40,7 @@ jobs:
           git clone --depth=1 https://github.com/mvaisakh/gcc-arm64.git toolchain/gcc-arm64
           git clone --depth=1 https://github.com/mvaisakh/gcc-arm.git toolchain/gcc-arm32
 
-      - name: Build Kernel
+          - name: Build Kernel
         run: |
           cd kernel-source
           export PATH="$(pwd)/../toolchain/clang/bin:$(pwd)/../toolchain/gcc-arm64/bin:$(pwd)/../toolchain/gcc-arm32/bin:$PATH"
@@ -48,8 +48,8 @@ jobs:
           export SUBARCH=arm64
           export CC=clang
           export CLANG_TRIPLE=aarch64-linux-gnu-
-          export CROSS_COMPILE=aarch64-linux-android-
-          export CROSS_COMPILE_ARM32=arm-linux-androideabi-
+          export CROSS_COMPILE=aarch64-elf-
+          export CROSS_COMPILE_ARM32=arm-eabi-
 
           make O=out vendor/xiaomi/mi8998_defconfig
           make -j$(nproc --all) O=out
