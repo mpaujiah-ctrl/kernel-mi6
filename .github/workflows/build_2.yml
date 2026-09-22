@@ -52,8 +52,13 @@ jobs:
           export CROSS_COMPILE_ARM32=arm-eabi-
 
           make O=out vendor/xiaomi/mi8998_defconfig
-          make -j$(nproc --all) O=out KCFLAGS="-Wno-error"
 
+          # Matiin ACPI yang otomatis kepicu dari dependency Kconfig lain
+          ./scripts/config --file out/.config --disable CONFIG_ACPI
+          make O=out olddefconfig
+
+          make -j$(nproc --all) O=out KCFLAGS="-Wno-error"
+    
       - name: Check Output
         run: |
           if [ -f kernel-source/out/arch/arm64/boot/Image.gz-dtb ]; then
