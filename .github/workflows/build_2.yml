@@ -20,14 +20,13 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential bc bison flex libssl-dev libncurses5-dev libncursesw5-dev libsqlite3-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev ccache zip lzop cpio libelf-dev
 
-      - name: Download Toolchain (AOSP Clang r536225 Official Mirror)
+      - name: Download Toolchain (AOSP Clang r536225)
         run: |
-          mkdir -p toolchain
-          # Download AOSP Clang r536225 langsung dari official Android tarball mirror
-          curl -LSs "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/b3a530ec6537146650e42be89f1089e9a3588460/clang-r536225.tar.gz" -o clang-r536225.tar.gz
           mkdir -p toolchain/clang
-          tar -xf clang-r536225.tar.gz -C toolchain/clang
-          rm clang-r536225.tar.gz
+          # Menggunakan curl dengan flag -L (follow redirect) agar link googlesource tidak HTTP 500 / exit code 8
+          curl -LSs "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/b3a530ec6537146650e42be89f1089e9a3588460/clang-r536225.tar.gz" -o clang.tar.gz
+          tar -xf clang.tar.gz -C toolchain/clang
+          rm clang.tar.gz
       
       - name: Build Kernel
         run: |
