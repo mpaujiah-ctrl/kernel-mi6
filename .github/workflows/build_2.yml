@@ -18,7 +18,7 @@ jobs:
       - name: Set up Environment
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential bc bison flex libssl-dev libncurses5-dev libncursesw5-dev libsqlite3-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev ccache zip lzop cpio libelf-dev
+          sudo apt-get install -y build-essential bc bison flex libssl-dev libncurses5-dev libncursesw5-dev libsqlite3-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev ccache zip lzop cpio libelf-dev libdebuginfod1
 
       - name: Download Toolchain (AOSP Clang r536225)
         run: |
