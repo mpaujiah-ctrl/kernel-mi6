@@ -55,6 +55,8 @@ jobs:
           grep -i "CONFIG_FB_MSM_MDSS" out/.config
           grep -i "CONFIG_MACH_XIAOMI_MSM8998" out/.config
 
+          # Nyalain flag Xiaomi MSM8998 yang ternyata jadi guard buat banyak fungsi display/speaker
+          ./scripts/config --file out/.config --enable CONFIG_MACH_XIAOMI_MSM8998
 
           # Matiin ACPI yang otomatis kepicu dari dependency Kconfig lain
           ./scripts/config --file out/.config --disable CONFIG_ACPI
