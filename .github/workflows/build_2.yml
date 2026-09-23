@@ -50,10 +50,10 @@ jobs:
           export CLANG_TRIPLE=aarch64-linux-gnu-
           export CROSS_COMPILE=aarch64-elf-
           export CROSS_COMPILE_ARM32=arm-eabi-
-
+         
+          make O=out vendor/xiaomi/mi8998_defconfig
           grep -i "CONFIG_FB_MSM_MDSS" out/.config
 
-          make O=out vendor/xiaomi/mi8998_defconfig
 
           # Matiin ACPI yang otomatis kepicu dari dependency Kconfig lain
           ./scripts/config --file out/.config --disable CONFIG_ACPI
