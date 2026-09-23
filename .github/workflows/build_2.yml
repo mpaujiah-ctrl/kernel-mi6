@@ -60,6 +60,9 @@ jobs:
 
           # Matiin ACPI yang otomatis kepicu dari dependency Kconfig lain
           ./scripts/config --file out/.config --disable CONFIG_ACPI
+          ./scripts/config --file out/.config --enable CONFIG_MACH_XIAOMI_MSM8998
+          ./scripts/config --file out/.config --enable CONFIG_MACH_SAGIT
+          ./scripts/config --file out/.config --disable CONFIG_ACPI
           make O=out olddefconfig
 
           make -j$(nproc --all) O=out KCFLAGS="-Wno-error -Wno-implicit-function-declaration"
