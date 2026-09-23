@@ -53,6 +53,7 @@ jobs:
          
           make O=out vendor/xiaomi/mi8998_defconfig
           grep -i "CONFIG_FB_MSM_MDSS" out/.config
+          grep -i "CONFIG_MACH_XIAOMI_MSM8998" out/.config
 
 
           # Matiin ACPI yang otomatis kepicu dari dependency Kconfig lain
